@@ -1,0 +1,82 @@
+import pygame
+import sys
+
+# Inicialização do Pygame
+pygame.init()
+
+# Configurações do jogo
+largura_tela = 800
+altura_tela = 600
+cor_fundo = (0, 0, 0)
+
+# Configurações da raquete
+raquete_largura = 20
+raquete_altura = 100
+cor_raquete = (255, 255, 255)
+
+# Configurações da bola
+bola_tamanho = 20
+cor_bola = (255, 255, 255)
+
+# Inicialização da tela
+tela = pygame.display.set_mode((largura_tela, altura_tela))
+pygame.display.set_caption("Pong")
+
+# Inicialização das raquetes e bola
+raquete_esquerda = pygame.Rect(50, altura_tela // 2 - raquete_altura // 2, raquete_largura, raquete_altura)
+raquete_direita = pygame.Rect(largura_tela - 50 - raquete_largura, altura_tela // 2 - raquete_altura // 2, raquete_largura, raquete_altura)
+bola = pygame.Rect(largura_tela // 2 - bola_tamanho // 2, altura_tela // 2 - bola_tamanho // 2, bola_tamanho, bola_tamanho)
+
+# Velocidade da bola
+velocidade_bola_x = 5
+velocidade_bola_y = 5
+
+# Loop principal do jogo
+while True:
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    # Movimentação das raquetes
+    teclas = pygame.key.get_pressed()
+    if teclas[pygame.K_w] and raquete_esquerda.top > 0:
+        raquete_esquerda.y -= 5
+    if teclas[pygame.K_s] and raquete_esquerda.bottom < altura_tela:
+        raquete_esquerda.y += 5
+    if teclas[pygame.K_UP] and raquete_direita.top > 0:
+        raquete_direita.y -= 5
+    if teclas[pygame.K_DOWN] and raquete_direita.bottom < altura_tela:
+        raquete_direita.y += 5
+
+    # Movimentação da bola
+    bola.x += velocidade_bola_x
+    bola.y += velocidade_bola_y
+
+    # Colisões com as paredes
+    if bola.top <= 0 or bola.bottom >= altura_tela:
+        velocidade_bola_y = -velocidade_bola_y
+
+    # Colisões com as raquetes
+    if bola.colliderect(raquete_esquerda) or bola.colliderect(raquete_direita):
+        velocidade_bola_x = -velocidade_bola_x
+
+    # Verifica se a bola saiu da tela
+    if bola.left <= 0 or bola.right >= largura_tela:
+        # Reinicia a posição da bola
+        bola.x = largura_tela // 2 - bola_tamanho // 2
+        bola.y = altura_tela // 2 - bola_tamanho // 2
+
+    # Limpa a tela
+    tela.fill(cor_fundo)
+
+    # Desenha as raquetes e a bola
+    pygame.draw.rect(tela, cor_raquete, raquete_esquerda)
+    pygame.draw.rect(tela, cor_raquete, raquete_direita)
+    pygame.draw.ellipse(tela, cor_bola, bola)
+
+    # Atualiza a tela
+    pygame.display.flip()
+
+    # Controla a taxa de quadros por segundo
+    pygame.time.Clock().tick(60)
